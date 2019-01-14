@@ -42,7 +42,7 @@ export default function(theme={}) {
       fontSize: appStyle.textDayHeaderFontSize,
       fontFamily: appStyle.textDayHeaderFontFamily,
       color: appStyle.textSectionTitleColor,
-      justifyContent:'center',
+      justifyContent:'space-around',
       textAlign: 'center'
     },
     ...(theme[STYLESHEET_ID] || {})

@@ -137,8 +137,8 @@ class CalendarHeader extends Component {
             {weekDaysNames.map((day, idx) => { 
               var width = Dimensions.get("window").width / 7;
               return (
-              <View key={idx} style={[this.style.dayHeader, {width, paddingLeft:width/4, borderLeftWidth: 1, borderLeftColor: 'lightgrey'}]}>
-                <Text allowFontScaling={false} accessible={false} numberOfLines={1} importantForAccessibility='no'>{day}</Text>
+              <View key={idx} style={[this.style.dayHeader, {width, borderLeftWidth: (idx === 0) ? 0 : 1, borderLeftColor: 'lightgrey'}]}>
+                <Text style={{paddingLeft:width/4}} allowFontScaling={false} accessible={false} numberOfLines={1} importantForAccessibility='no'>{day}</Text>
               </View>
             )})}
           </View>

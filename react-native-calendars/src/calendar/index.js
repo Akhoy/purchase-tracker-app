@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {
   View,
-  ViewPropTypes
+  ViewPropTypes,
+  Text
 } from 'react-native';
 import PropTypes from 'prop-types';
 
@@ -155,6 +156,7 @@ class Calendar extends Component {
   }
 
   renderDay(day, id) {
+    
     const minDate = parseDate(this.props.minDate);
     const maxDate = parseDate(this.props.maxDate);
     let state = '';
@@ -171,11 +173,10 @@ class Calendar extends Component {
     if (!dateutils.sameMonth(day, this.state.currentMonth) && this.props.hideExtraDays) {
       return (<View key={id} style={{flex: 1}}/>);
     }
-
     const DayComp = this.getDayComponent();
     const date = day.getDate();
     return (
-      <View style={{flex: 1, alignItems: 'center'}} key={id}>
+      <View style={{flex: 1, alignItems: 'center'}} key={id}>      
         <DayComp
           state={state}
           theme={this.props.theme}
@@ -183,7 +184,9 @@ class Calendar extends Component {
           onLongPress={this.longPressDay}
           date={xdateToData(day)}
           marking={this.getDateMarking(day)}
-        >
+          height = {this.state.height}
+          index = {id}
+          >
           {date}
         </DayComp>
       </View>
@@ -222,7 +225,7 @@ class Calendar extends Component {
   }
 
   renderWeekNumber (weekNumber) {
-    return <Day key={`week-${weekNumber}`} theme={this.props.theme} marking={{disableTouchEvent: true}} state='disabled'>{weekNumber}</Day>;
+    return <Day key={`week-${weekNumber}`} theme={this.props.theme} marking={{disableTouchEvent: true}} state='disabled' height={this.state.height}>{weekNumber}</Day>;
   }
 
   renderWeek(days, id) {
@@ -234,7 +237,6 @@ class Calendar extends Component {
     if (this.props.showWeekNumbers) {
       week.unshift(this.renderWeekNumber(days[days.length - 1].getWeek()));
     }
-
     return (<View style={this.style.week} key={id}>{week}</View>);
   }
 
@@ -246,6 +248,7 @@ class Calendar extends Component {
     const days = dateutils.page(this.state.currentMonth, this.props.firstDay);
     const weeks = [];
     while (days.length) {
+      
       weeks.push(this.renderWeek(days.splice(0, 7), weeks.length));
     }
     let indicator;
@@ -258,11 +261,7 @@ class Calendar extends Component {
       }
     }
     return (
-      <View style={[this.style.container, this.props.style]} onLayout={(event) => {
-        var {x, y, width, height} = event.nativeEvent.layout; 
-        console.log("whole view"); 
-        console.log({x, y, width, height});
-      }}>
+      <View style={[this.style.container, this.props.style, {height:'100%'}]}>
         <CalendarHeader
           theme={this.props.theme}
           hideArrows={this.props.hideArrows}
@@ -277,16 +276,20 @@ class Calendar extends Component {
           onPressArrowLeft={this.props.onPressArrowLeft}
           onPressArrowRight={this.props.onPressArrowRight}
         />
-        <View style={{flex:1, alignItems:'stretch', flexDirection:'column', height:'100%', backgroundColor:'blue'}} onLayout={(event) => {
-            var {x, y, width, height} = event.nativeEvent.layout;      
-            console.log({x, y, width, height})
-              //this.setState({height});
-            }}>
+               
+        <View style={[this.style.monthView, {height:'100%'}]} onLayout={(event) => {        
+          if (!this.state.height){
+            var {x, y, width, height} = event.nativeEvent.layout;
+            var hght = (height - y)/5;            
+            this.shouldComponentUpdate = {update:true};
+            this.setState({height:hght}, () => {
+            });
+          }
+        }}>        
         {          
-          this.state.height ? <View style={this.style.monthView}>{weeks}</View> : undefined
+          weeks
         }
         </View>
-        
       </View>);
   }
 }

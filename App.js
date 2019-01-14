@@ -8,7 +8,7 @@
 
 import React, {Component} from 'react';
 import {TextInput, View, StyleSheet, Platform, Dimensions} from 'react-native';
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import { Calendar, CalendarList, Agenda } from './react-native-calendars';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload blah blah,\n' + 'Cmd+D or shake for dev menu',
@@ -19,7 +19,6 @@ const instructions = Platform.select({
 type Props = {};
 export default class App extends Component<Props> {
   render() {
-    console.log(Dimensions.get('window').height);
     return (
       
       <View>
@@ -27,14 +26,12 @@ export default class App extends Component<Props> {
         <Calendar style={styles.calendar} theme={{
           'stylesheet.day.basic':{
             'base':{
-              width:'100%', 
-              height:90,
-              borderLeftColor:'lightgrey',
-              borderLeftWidth:1,
-              borderBottomColor:'lightgrey',
+              width:'100%',
+              borderLeftColor:'lightgrey',              
               borderBottomWidth:1,
+              borderBottomColor:'lightgrey',
               textAlign:'center',
-              justifyContent:'center',
+              justifyContent:'flex-start',
               alignItems:'center'
               }
             },

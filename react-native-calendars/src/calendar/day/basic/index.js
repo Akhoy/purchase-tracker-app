@@ -22,7 +22,7 @@ class Day extends Component {
     date: PropTypes.object
   };
 
-  constructor(props) {
+  constructor(props) {    
     super(props);
     this.style = styleConstructor(props.theme);
     this.onDayPress = this.onDayPress.bind(this);
@@ -37,10 +37,13 @@ class Day extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
+    if(!nextProps.height)    
     return shouldUpdate(this.props, nextProps, ['state', 'children', 'marking', 'onPress', 'onLongPress']);
+    return true;
   }
 
   render() {
+    
     const containerStyle = [this.style.base];
     const textStyle = [this.style.text];
     const dotStyle = [this.style.dot];
@@ -74,10 +77,9 @@ class Day extends Component {
       containerStyle.push(this.style.today);
       textStyle.push(this.style.todayText);
     }
-
     return (
       <TouchableOpacity
-        style={containerStyle}
+        style={[containerStyle, {height:this.props.height, borderLeftWidth: (this.props.index % 7 !== 0) ? 1 : 0}]}
         onPress={this.onDayPress}
         onLongPress={this.onDayLongPress}
         activeOpacity={marking.activeOpacity}
