@@ -7,8 +7,30 @@
  */
 
 import React, {Component} from 'react';
-import {TextInput, View, StyleSheet, Platform, Dimensions} from 'react-native';
+import {TextInput, View, StyleSheet, Platform, Dimensions, KeyboardAvoidingView} from 'react-native';
 import { Calendar, CalendarList, Agenda } from './react-native-calendars';
+import {
+  Container,
+  Header,
+  Left,
+  Body,
+  Right,
+  Title,
+  Button,
+  Content,
+  Form,
+  Item,
+  Input,
+  Label,
+  Icon, Fab
+} from 'native-base';
+import {
+  createAppContainer,
+  createStackNavigator,
+  StackActions,
+  NavigationActions,
+} from 'react-navigation';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload blah blah,\n' + 'Cmd+D or shake for dev menu',
@@ -17,10 +39,16 @@ const instructions = Platform.select({
 });
 
 type Props = {};
-export default class App extends Component<Props> {
+export class CalendarView extends Component<Props> {
+  static navigationOptions = {
+    header: null,
+  };
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return (
-      
       <View>
       <View contentContainerStyle={{marginTop:-20}} behavior={(Platform.OS === 'ios') ? 'padding' : null} enabled>
         <Calendar style={styles.calendar} theme={{
@@ -43,10 +71,29 @@ export default class App extends Component<Props> {
               }
             }
           }}/>
-          
           </View>
       </View>
-      )
+    );
+  }
+}
+
+const RootStack = createStackNavigator(
+  {
+    Home: CalendarView
+  },
+  {
+    initialRouteName: 'Home',
+  }
+);
+
+const AppContainer = createAppContainer(RootStack);
+
+export default class App extends Component<Props> {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return <AppContainer />;
   }
 }
 
