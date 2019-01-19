@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {TextInput, View, StyleSheet, Platform, Dimensions, KeyboardAvoidingView} from 'react-native';
+import {TextInput, Text, View, StyleSheet, Platform, Dimensions, KeyboardAvoidingView} from 'react-native';
 import { Calendar, CalendarList, Agenda } from './react-native-calendars';
 import {
   Container,
@@ -71,15 +71,88 @@ export class CalendarView extends Component<Props> {
               }
             }
           }}/>
+          <Fab
+            active={true}
+            style={{ backgroundColor: 'rgba(231,76,60,1)' }}
+            position="bottomRight"
+            onPress={() => {
+              this.props.navigation.navigate('Form');
+              }}>
+            <Icon name="add" />
+            </Fab>
           </View>
       </View>
     );
   }
 }
 
+export class FormView extends Component {
+  static navigationOptions = {
+    header: null,
+  };
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    const { goBack } = this.props.navigation;
+    return (
+      <Container>
+        <Header style={styles.header}>
+          <Left>
+            <Button transparent>
+              <Icon
+                name="md-arrow-round-back"
+                size={24}
+                color="white"
+                onPress={() => goBack()}
+              />
+            </Button>
+          </Left>
+          <Body>
+            <Title>Quantity</Title>
+          </Body>
+        </Header>
+        <Content
+          padder
+          contentContainerStyle={{ flexGrow: 1  }}
+          style={{ flex: 1}}>
+          <View style={{ flex: 1, justifyContent: 'space-between'  }}>
+            <Form>
+              <Item stackedLabel>
+                <Label>Quantity Purchased (in L)</Label>
+                <Input autoFocus keyboardType="numeric" />
+              </Item>
+            </Form>
+          </View>
+          <KeyboardAvoidingView
+            style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+            <Button
+              light
+              iconLeft
+              style={styles.buttons}
+              onPress={() => goBack()}>
+              <Icon
+                style={{ marginRight: 10 }}
+                name="md-arrow-back"
+                size={24}
+              />
+              <Text>Back</Text>
+            </Button>
+            <Button light iconRight style={styles.buttons}>
+              <Text>Save</Text>
+              <Icon name="md-save" size={24} style={{ marginLeft: 10 }} />
+            </Button>
+          </KeyboardAvoidingView>
+        </Content>
+      </Container>
+    );
+  }
+}
+
 const RootStack = createStackNavigator(
   {
-    Home: CalendarView
+    Home: CalendarView,
+    Form: FormView
   },
   {
     initialRouteName: 'Home',
@@ -113,5 +186,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },  
+  buttons: {
+    width: '49%',
+    justifyContent: 'center',
   },
 });
