@@ -30,7 +30,7 @@ import {
   StackActions,
   NavigationActions,
 } from 'react-navigation';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { Navigation } from "react-native-navigation";
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload blah blah,\n' + 'Cmd+D or shake for dev menu',
@@ -73,10 +73,21 @@ export class CalendarView extends Component<Props> {
           }}/>
           <Fab
             active={true}
+            containerStyle={{ }}
             style={{ backgroundColor: 'rgba(231,76,60,1)' }}
             position="bottomRight"
             onPress={() => {
-              this.props.navigation.navigate('Form');
+              Navigation.push(this.props.componentId, {
+                component: {
+                  name: 'FormView',
+                  options: {
+                    topBar: {
+                      visible: false,
+                      height:0
+                    }
+                  }
+                }
+              });
               }}>
             <Icon name="add" />
             </Fab>
@@ -94,7 +105,7 @@ export class FormView extends Component {
     super(props);
   }
   render() {
-    const { goBack } = this.props.navigation;
+    //const { goBack } = this.props.navigation;
     return (
       <Container>
         <Header style={styles.header}>
@@ -149,17 +160,32 @@ export class FormView extends Component {
   }
 }
 
-const RootStack = createStackNavigator(
-  {
-    Home: CalendarView,
-    Form: FormView
-  },
-  {
-    initialRouteName: 'Home',
-  }
-);
+Navigation.registerComponent(`CalendarView`, () => CalendarView);
+Navigation.registerComponent(`FormView`, () => FormView);
 
-const AppContainer = createAppContainer(RootStack);
+Navigation.events().registerAppLaunchedListener(() => {
+  Navigation.setRoot({
+    root: {
+      stack: {
+        options: {
+          topBar: {
+            visible: false,
+            height:0
+          }
+        },
+        children: [
+          {
+            component: {
+              name: 'CalendarView'
+            }
+          }
+        ]
+      }
+    }
+  });
+});
+
+/*const AppContainer = createAppContainer(RootStack);
 
 export default class App extends Component<Props> {
   constructor(props) {
@@ -168,7 +194,7 @@ export default class App extends Component<Props> {
   render() {
     return <AppContainer />;
   }
-}
+}*/
 
 const styles = StyleSheet.create({
   container: {
