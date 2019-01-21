@@ -8,23 +8,23 @@ export default class FormView extends Component {
     };
     constructor(props) {
       super(props);
+      console.log(props);
     }
     render() {
       return (
         <Container>
-          <Header style={styles.header}>
+          <Header>
             <Left>
               <Button transparent>
                 <Icon
-                  name="md-arrow-round-back"
-                  size={24}
+                  name="md-arrow-round-back"                  
                   color="white"
                   onPress={() => {Navigation.pop(this.props.componentId)}}
                 />
               </Button>
             </Left>
-            <Body>
-              <Title>Quantity</Title>
+            <Body style={{justifyContent:'flex-start'}}>
+              <Title style={{textAlign:'left'}}>{this.props && this.props.text ? this.props.text.toString('MMMM d') + ' milk purchase': ""}</Title>
             </Body>
           </Header>
           <Content

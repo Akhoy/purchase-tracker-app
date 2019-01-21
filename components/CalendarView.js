@@ -3,16 +3,28 @@ import {View, Platform} from 'react-native';
 import { Calendar } from '../react-native-calendars';
 import { Icon, Fab } from 'native-base';
 import { Navigation } from "react-native-navigation";
+import XDate from 'xdate';
 export default class CalendarView extends Component {    
     constructor(props) {  
-      super(props);    
+      super(props); 
+      var xDate = new XDate(true);
+      this.state = {
+          selectedDate:{dateString:xDate.toString('yyyy-MM-dd'), day:xDate.getDate(), month:xDate.getMonth()+1, timestamp:0, year:xDate.getFullYear()}
+      }   
     }
-  
-    render() {
+    
+    render() {        
+            ({year, month, day} = this.state.selectedDate);
+            console.log(new XDate(year, month-1, day));
+            //console.log(this.state.selectedDate);
+        
+        
       return (
         <View>
         <View behavior={(Platform.OS === 'ios') ? 'padding' : null} enabled>
-          <Calendar theme={{
+          <Calendar onDayPress={(day) => {
+              this.setState({selectedDate:day})
+            }} theme={{
             'stylesheet.day.basic':{
               'base':{
                 width:'100%',
@@ -41,7 +53,10 @@ export default class CalendarView extends Component {
               onPress={() => {
                 Navigation.push(this.props.componentId, {
                   component: {
-                    name: 'FormView'
+                    name: 'FormView',
+                    passProps: {
+                        text: new XDate(this.state.selectedDate.dateString)
+                      },
                   }
                 });
                 }}>
