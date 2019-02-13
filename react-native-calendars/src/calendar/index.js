@@ -76,7 +76,9 @@ class Calendar extends Component {
     // Handler which gets executed when press arrow icon left. It receive a callback can go back month
     onPressArrowLeft: PropTypes.func,
     // Handler which gets executed when press arrow icon left. It receive a callback can go next month
-    onPressArrowRight: PropTypes.func
+    onPressArrowRight: PropTypes.func,
+    //prop to handle showing quantity indicator
+    //dateArray:PropTypes.array
   };
 
   constructor(props) {
@@ -98,15 +100,26 @@ class Calendar extends Component {
     this.pressDay = this.pressDay.bind(this);
     this.longPressDay = this.longPressDay.bind(this);
     this.shouldComponentUpdate = shouldComponentUpdate;
+
+    this.dateQtyArray = this.props.dateArray;
+    this.changed = false;
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('inside component will receive props');
     const current= parseDate(nextProps.current);
     if (current && current.toString('yyyy MM') !== this.state.currentMonth.toString('yyyy MM')) {
       this.setState({
         currentMonth: current.clone()
       });
     }
+  }
+
+  componentDidMount(){
+    if(this.changed)
+      this.props.updateDateArrayState(this.dateQtyArray);
+      console.log('in component did mount');
+      console.log(this.dateQtyArray);
   }
 
   updateMonth(day, doNotTriggerListeners) {
@@ -175,6 +188,19 @@ class Calendar extends Component {
     }
     const DayComp = this.getDayComponent();
     const date = day.getDate();
+
+    //save color for each item in the date array which has quantity
+    let index = this.dateQtyArray && this.dateQtyArray.length > 0 ? this.dateQtyArray.findIndex(
+      item => item.dateString === day.toString('yyyy-MM-dd')) : -1;
+    let objArray = index > -1 ? this.dateQtyArray[index] : null;
+    let quantity = objArray ? objArray.quantity : null;
+    let color = objArray ? objArray.color : null;
+
+    if(quantity && !color){
+      color = this.props.bgColorFunc(Math.random(), 0.7, 0.7);
+      this.dateQtyArray[index].color = color;
+      changed = true;
+    }
     return (
       <View style={{flex: 1, alignItems: 'center'}} key={id}>      
         <DayComp
@@ -186,6 +212,9 @@ class Calendar extends Component {
           marking={this.getDateMarking(day)}
           height = {this.state.height}
           index = {id}
+          //pass quantity only if its there
+          quantity = {quantity}
+          color={color}
           >
           {date}
         </DayComp>
@@ -232,7 +261,7 @@ class Calendar extends Component {
     const week = [];
     days.forEach((day, id2) => {
       week.push(this.renderDay(day, id2));
-    }, this);
+    }, this);    
 
     if (this.props.showWeekNumbers) {
       week.unshift(this.renderWeekNumber(days[days.length - 1].getWeek()));
@@ -244,11 +273,10 @@ class Calendar extends Component {
     heightOfHeader && heightOfHeader > 0 ? Dimensions.get('window').height - heightOfHeader : 0;
   }
 
-  render() {
+  render() {    
     const days = dateutils.page(this.state.currentMonth, this.props.firstDay);
     const weeks = [];
     while (days.length) {
-      
       weeks.push(this.renderWeek(days.splice(0, 7), weeks.length));
     }
     let indicator;

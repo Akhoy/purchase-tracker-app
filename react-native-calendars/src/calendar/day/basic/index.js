@@ -6,8 +6,8 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import {shouldUpdate} from '../../../component-updater';
-
 import styleConstructor from './style';
+import invert from 'invert-color';
 
 class Day extends Component {
   static propTypes = {
@@ -47,6 +47,7 @@ class Day extends Component {
     const containerStyle = [this.style.base];
     const textStyle = [this.style.text];
     const dotStyle = [this.style.dot];
+    //const dayTextSelectedStyle = [];
 
     let marking = this.props.marking || {};
     if (marking && marking.constructor === Array && marking.length) {
@@ -54,6 +55,9 @@ class Day extends Component {
         marking: true
       };
     }
+    let quantityVal = this.props.quantity;
+    let qtyColor = this.props.color;
+    let quantity;
     const isDisabled = typeof marking.disabled !== 'undefined' ? marking.disabled : this.props.state === 'disabled';
     let dot;
     if (marking.marked) {
@@ -65,7 +69,8 @@ class Day extends Component {
     }
 
     if (marking.selected) {
-      containerStyle.push(this.style.selected);
+      //containerStyle.push(this.style.selected);
+      textStyle.push(this.style.selected);
       if (marking.selectedColor) {
         containerStyle.push({backgroundColor: marking.selectedColor});
       }
@@ -77,6 +82,17 @@ class Day extends Component {
       containerStyle.push(this.style.today);
       textStyle.push(this.style.todayText);
     }
+    if(quantityVal){
+      let bgColorObj = this.props.color;
+      let invertedColor = invert(bgColorObj, true);
+      console.log(invertedColor)
+      quantity = (
+      <View style={[this.style.quantityView, {backgroundColor:`rgb(${bgColorObj.r},${bgColorObj.g},${bgColorObj.b})`}]}><Text style={[this.style.quantityText, {color:invertedColor}]}>
+      {String(quantityVal)}
+      </Text>
+      </View>
+      );
+    }
     return (
       <TouchableOpacity
         //style={[containerStyle, {height:this.props.height, borderLeftWidth: (this.props.index % 7 !== 0) ? 1 : 0}]}
@@ -87,6 +103,7 @@ class Day extends Component {
         disabled={marking.disableTouchEvent}
       >
         <Text allowFontScaling={false} style={textStyle}>{String(this.props.children)}</Text>
+        {quantity}
         {dot}
       </TouchableOpacity>
     );

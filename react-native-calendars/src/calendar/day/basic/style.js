@@ -17,12 +17,28 @@ export default function styleConstructor(theme={}) {
       color: appStyle.dayTextColor,
       backgroundColor: 'rgba(255, 255, 255, 0)'
     },
+    quantityView:{
+      marginTop:20,
+      alignSelf: 'flex-start',
+      width:'100%'
+    },
+    quantityText:{
+      fontSize:14,
+      paddingLeft:4,
+      paddingTop:1,
+      paddingBottom:2,
+      paddingRight:2,
+      textAlign:'center',
+      fontWeight:"200"
+    },
     alignedText: {
       marginTop: Platform.OS === 'android' ? 4 : 6
     },
     selected: {
       backgroundColor: appStyle.selectedDayBackgroundColor,
-      borderRadius: 16
+      borderRadius: 12,
+      width:25,
+      textAlign:'center'
     },
     today: {
       backgroundColor: appStyle.todayBackgroundColor

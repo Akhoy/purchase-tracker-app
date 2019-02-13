@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import {Text, View, KeyboardAvoidingView, StyleSheet} from 'react-native';
+import {Text, View, KeyboardAvoidingView, StyleSheet, AsyncStorage} from 'react-native';
 import { Container, Header, Left, Body, Title, Button, Content, Form, Item, Input, Label, Icon } from 'native-base';
 import { Navigation } from "react-native-navigation";
+import { dayTextColor } from '../react-native-calendars/src/style';
 export default class FormView extends Component {
     static navigationOptions = {
       header: null,
@@ -9,8 +10,10 @@ export default class FormView extends Component {
     constructor(props) {
       super(props);
       console.log(props);
+      this.qty = null;
     }
     render() {
+      let date = this.props.date; 
       return (
         <Container>
           <Header>
@@ -24,7 +27,7 @@ export default class FormView extends Component {
               </Button>
             </Left>
             <Body style={{justifyContent:'flex-start'}}>
-              <Title style={{textAlign:'left'}}>{this.props && this.props.text ? this.props.text.toString('MMMM d') + ' milk purchase': ""}</Title>
+              <Title style={{textAlign:'left'}}>{date ? date.toString('MMMM d') + ' milk purchase': ""}</Title>
             </Body>
           </Header>
           <Content
@@ -35,7 +38,7 @@ export default class FormView extends Component {
               <Form>
                 <Item stackedLabel>
                   <Label>Quantity Purchased (in L)</Label>
-                  <Input autoFocus keyboardType="numeric" />
+                  <Input autoFocus keyboardType="numeric" onChangeText={data => this.qty = data } />
                 </Item>
               </Form>
             </View>
@@ -53,7 +56,16 @@ export default class FormView extends Component {
                 />
                 <Text>Back</Text>
               </Button>
-              <Button light iconRight style={styles.buttons}>
+              <Button light iconRight style={styles.buttons} onPress={async () => {
+                try {
+                  await this.props.callback(this.qty);
+                  //go back
+                  Navigation.pop(this.props.componentId);
+                } catch (error) {
+                  // Error saving data
+                  alert(error);
+                }
+              }}>
                 <Text>Save</Text>
                 <Icon name="save" size={24} style={{ marginLeft: 10 }} type="MaterialIcons" />
               </Button>

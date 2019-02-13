@@ -50,6 +50,7 @@ function weekDayNames(firstDayOfWeek = 0) {
 }
 
 function page(xd, firstDayOfWeek) {
+  
   const days = month(xd);
   let before = [], after = [];
 
