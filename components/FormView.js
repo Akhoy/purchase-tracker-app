@@ -2,19 +2,58 @@ import React, { Component } from 'react';
 import { Text, View, KeyboardAvoidingView, StyleSheet, Keyboard, Platform } from 'react-native';
 import { Container, Header, Left, Body, Title, Button, Content, Form, Item, Input, Label, Icon } from 'native-base';
 import { Navigation } from "react-native-navigation";
-import { dayTextColor } from '../react-native-calendars/src/style';
+
 export default class FormView extends Component {
+
   static navigationOptions = {
     header: null,
   };
-  static keyboardEventIndex = 0;
   constructor(props) {
     super(props);
     console.log(props);
     this.qty = null;
+    this.isKeyboardOpen = false;
+    this.goBack = false;
   }
+  goBackFunc() {
+    if (this.isKeyboardOpen) {
+      this.goBack = true;
+      Keyboard.dismiss();
+    }
+    else {
+      //go back
+      Navigation.pop(this.props.componentId);
+      //show tabs
+      Navigation.mergeOptions('BottomTabsId', {
+        bottomTabs: {
+          visible: true,
+          ...Platform.select({ android: { drawBehind: false, animate: false } })
+        },
+      });
+    }
+  }
+
+  _keyboardDidShow() {
+    this.isKeyboardOpen = true;
+    console.log('this.iskeyboardopen in event listerberkeybowrd did show ' + this.isKeyboardOpen);
+  }
+
   componentDidMount() {
-    
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
+    new Promise((resolve, reject) => {
+      const didListener = Keyboard.addListener('keyboardDidHide', () => {
+        this.isKeyboardOpen = false;
+        //this.goback check added here to differentiate other keyboard hide events. this promise should only resolve if going back so as to pop from the stack
+        if (this.goBack) {
+          didListener.remove();
+          resolve();
+        }
+      })
+    }).then(() => {
+      console.log('inside promise done!')
+      this.goBackFunc();
+    });
+
   }
 
   render() {
@@ -27,16 +66,7 @@ export default class FormView extends Component {
               <Icon
                 name="md-arrow-round-back"
                 color="white"
-                onPress={() => {
-                  Navigation.pop(this.props.componentId);
-                  //show tabs
-                  Navigation.mergeOptions('BottomTabsId', {
-                    bottomTabs: {
-                      visible: true,
-                      ...Platform.select({ android: { drawBehind: false } })
-                    },
-                  });
-                }}
+                onPress={() => this.goBackFunc()}
               />
             </Button>
           </Left>
@@ -62,26 +92,7 @@ export default class FormView extends Component {
               light
               iconLeft
               style={styles.buttons}
-              onPress={() => {
-                new Promise((resolve, reject) => {
-                  const didListener = Keyboard.addListener('keyboardDidHide', () => {
-                    didListener.remove();
-                    resolve();
-                  })
-                }).then(() => {
-                  console.log('inside promise done!')
-                  //go back
-                  Navigation.pop(this.props.componentId);
-                  //show tabs
-                  Navigation.mergeOptions('BottomTabsId', {
-                    bottomTabs: {
-                      visible: true,
-                      ...Platform.select({ android: { drawBehind: false, animate: false } })
-                    },
-                  });
-                });
-                Keyboard.dismiss();
-              }}>
+              onPress={() => this.goBackFunc()}>
               <Icon
                 style={{ marginRight: 10 }}
                 name="arrow-back" type="MaterialIcons"
@@ -92,6 +103,7 @@ export default class FormView extends Component {
             <Button light iconRight style={styles.buttons} onPress={async () => {
               try {
                 await this.props.callback(this.qty);
+                this.goBackFunc();
               } catch (error) {
                 // Error saving data
                 alert(error);

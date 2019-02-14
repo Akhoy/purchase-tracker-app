@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Platform, AsyncStorage } from 'react-native';
+import { View, Platform, AsyncStorage } from 'react-native';
 import { Calendar } from '../react-native-calendars';
 import { Icon, Fab } from 'native-base';
 import { Navigation } from "react-native-navigation";
