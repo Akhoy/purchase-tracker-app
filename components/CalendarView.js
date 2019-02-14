@@ -135,8 +135,17 @@ export default class CalendarView extends Component {
                     date:this.state.selectedDate.date,
                     callback: this.setDateArray
                   },
+                  options: { bottomTabs: {visible: false,
+                  drawBehind: true, animate:true }}
                 }
               });
+              //hide tabs
+              /*Navigation.mergeOptions('BottomTabsId', {
+                bottomTabs: {
+                  visible: false,
+                  ...Platform.select({ android: { drawBehind: true } })
+                },
+              });*/
             }}>
             <Icon name="add" />
           </Fab>

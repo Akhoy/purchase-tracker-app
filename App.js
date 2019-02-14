@@ -11,7 +11,13 @@ Navigation.registerComponent(`TotalView`, () => TotalView);
 Navigation.registerComponent(`PriceView`, () => PriceView);
 Navigation.setRoot({
   root: {
-    bottomTabs: { 
+    bottomTabs: {
+      id: 'BottomTabsId',
+      options:{
+        bottomTabs:{
+          titleDisplayMode: 'alwaysHide'
+        }
+      },
       children: [{
         stack: {
           options: {  
@@ -20,8 +26,8 @@ Navigation.setRoot({
               height:0
             },
             bottomTab: {
-              text: 'Calendar',
-              icon: require('./images/calendar.png')
+              icon: require('./images/icons8-calendar-24.png'),
+              text:'Calendar'
             }
           },
           children: [
@@ -38,8 +44,8 @@ Navigation.setRoot({
           name: 'TotalView',
           options: {
             bottomTab: {
-              text: 'Total',
-              icon: require('./images/total.png')
+              icon: require('./images/icons8-calculator-24.png'),
+              text:'Calculator'
             }
           }
         }
@@ -49,8 +55,8 @@ Navigation.setRoot({
           name: 'PriceView',
           options: {
             bottomTab: {
-              text: 'Price',
-              icon: require('./images/rupee.png')
+              icon: require('./images/icons8-rupee-24.png'),
+              text:'Price'
             }
           }
         }
