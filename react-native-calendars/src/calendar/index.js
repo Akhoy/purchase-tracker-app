@@ -76,9 +76,7 @@ class Calendar extends Component {
     // Handler which gets executed when press arrow icon left. It receive a callback can go back month
     onPressArrowLeft: PropTypes.func,
     // Handler which gets executed when press arrow icon left. It receive a callback can go next month
-    onPressArrowRight: PropTypes.func,
-    //prop to handle showing quantity indicator
-    //dateArray:PropTypes.array
+    onPressArrowRight: PropTypes.func
   };
 
   constructor(props) {
@@ -100,26 +98,17 @@ class Calendar extends Component {
     this.pressDay = this.pressDay.bind(this);
     this.longPressDay = this.longPressDay.bind(this);
     this.shouldComponentUpdate = shouldComponentUpdate;
-
     this.dateQtyArray = this.props.dateArray;
-    this.changed = false;
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('inside component will receive props');
     const current= parseDate(nextProps.current);
     if (current && current.toString('yyyy MM') !== this.state.currentMonth.toString('yyyy MM')) {
       this.setState({
         currentMonth: current.clone()
       });
     }
-  }
-
-  componentDidMount(){
-    if(this.changed)
-      this.props.updateDateArrayState(this.dateQtyArray);
-      console.log('in component did mount');
-      console.log(this.dateQtyArray);
+    this.dateQtyArray = nextProps.dateArray;
   }
 
   updateMonth(day, doNotTriggerListeners) {
@@ -189,18 +178,19 @@ class Calendar extends Component {
     const DayComp = this.getDayComponent();
     const date = day.getDate();
 
-    //save color for each item in the date array which has quantity
+    /*
+    Following code is for setting quantity and the color - have passed the rendering part to wix code since creating a custom day component just for that is tedious and time consuming
+    */
     let index = this.dateQtyArray && this.dateQtyArray.length > 0 ? this.dateQtyArray.findIndex(
       item => item.dateString === day.toString('yyyy-MM-dd')) : -1;
     let objArray = index > -1 ? this.dateQtyArray[index] : null;
     let quantity = objArray ? objArray.quantity : null;
     let color = objArray ? objArray.color : null;
-
-    if(quantity && !color){
+    
+    //save color for each item in the date array which has quantity - only for those cases where color is already not present
+    if(quantity && !color)
       color = this.props.bgColorFunc(Math.random(), 0.7, 0.7);
-      this.dateQtyArray[index].color = color;
-      changed = true;
-    }
+    
     return (
       <View style={{flex: 1, alignItems: 'center'}} key={id}>      
         <DayComp

@@ -11,6 +11,8 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme" 
       android:usesCleartextTraffic="true">
+      <activity android:name="com.reactnativenavigation.controllers.NavigationActivity"
+         android:windowSoftInputMode="stateAlwaysHidden|adjustPan|adjustResize" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

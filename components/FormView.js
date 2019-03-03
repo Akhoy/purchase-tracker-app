@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, KeyboardAvoidingView, StyleSheet, Keyboard, Platform } from 'react-native';
+import { Text, View, KeyboardAvoidingView, StyleSheet, Keyboard, Platform, StatusBar } from 'react-native';
 import { Container, Header, Left, Body, Title, Button, Content, Form, Item, Input, Label, Icon } from 'native-base';
 import { Navigation } from "react-native-navigation";
 
@@ -60,18 +60,17 @@ export default class FormView extends Component {
     let date = this.props.date;
     return (
       <Container>
-        <Header>
+        <Header androidStatusBarColor="white" iosBarStyle="dark-content" style={{ backgroundColor: 'white'}}>
           <Left>
             <Button transparent>
-              <Icon
+              <Icon style={{color:'black'}}
                 name="md-arrow-round-back"
-                color="white"
                 onPress={() => this.goBackFunc()}
               />
             </Button>
           </Left>
-          <Body style={{ justifyContent: 'flex-start' }}>
-            <Title style={{ textAlign: 'left' }}>{date ? date.toString('MMMM d') + ' milk purchase' : ""}</Title>
+          <Body>
+            <Title style={{color:'black'}}>{date ? date.toString('MMMM d') + ' milk purchase' : ""}</Title>
           </Body>
         </Header>
         <Content

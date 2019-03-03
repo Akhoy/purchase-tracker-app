@@ -85,7 +85,6 @@ class Day extends Component {
     if(quantityVal){
       let bgColorObj = this.props.color;
       let invertedColor = invert(bgColorObj, true);
-      console.log(invertedColor)
       quantity = (
       <View style={[this.style.quantityView, {backgroundColor:`rgb(${bgColorObj.r},${bgColorObj.g},${bgColorObj.b})`}]}><Text style={[this.style.quantityText, {color:invertedColor}]}>
       {String(quantityVal)}

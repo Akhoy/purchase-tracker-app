@@ -4,11 +4,11 @@ import FormView from "./components/FormView";
 import TotalView from "./components/TotalView";
 import PriceView from "./components/PriceView";
 
-
 Navigation.registerComponent(`CalendarView`, () => CalendarView);
 Navigation.registerComponent(`FormView`, () => FormView);
 Navigation.registerComponent(`TotalView`, () => TotalView);
 Navigation.registerComponent(`PriceView`, () => PriceView);
+
 Navigation.setRoot({
   root: {
     bottomTabs: {
@@ -20,20 +20,27 @@ Navigation.setRoot({
       },
       children: [{
         stack: {
-          options: {  
+          options: {             
             topBar: {
               visible: false,
               height:0
-            },
-            bottomTab: {
-              icon: require('./images/icons8-calendar-24.png'),
-              text:'Calendar'
             }
           },
           children: [
             {
               component: {
-                name: 'CalendarView'
+                name: 'CalendarView',
+                id:'CalendarView',
+                options:{
+                  statusBar:{
+                    backgroundColor:'white',
+                    style:'dark'
+                  },
+                  bottomTab: {
+                    icon: require('./images/icons8-calendar-24.png'),
+                    text:'Calendar'
+                  }
+                }
               }
             }
           ]
@@ -43,9 +50,17 @@ Navigation.setRoot({
         component: {
           name: 'TotalView',
           options: {
+            topBar: {
+              visible: true,
+              title:'test'
+            },
             bottomTab: {
               icon: require('./images/icons8-calculator-24.png'),
               text:'Calculator'
+            },
+            statusBar:{
+              backgroundColor:'white',
+              style:'dark'
             }
           }
         }
@@ -57,6 +72,10 @@ Navigation.setRoot({
             bottomTab: {
               icon: require('./images/icons8-rupee-24.png'),
               text:'Price'
+            },
+            statusBar:{
+              backgroundColor:'white',
+              style:'dark'
             }
           }
         }

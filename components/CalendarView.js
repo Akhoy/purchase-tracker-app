@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
-import { View, Platform, AsyncStorage } from 'react-native';
+import { View, Platform, AsyncStorage, StatusBar } from 'react-native';
 import { Calendar } from '../react-native-calendars';
 import { Icon, Fab } from 'native-base';
 import { Navigation } from "react-native-navigation";
 import XDate from 'xdate';
 import invert from 'invert-color';
 
+import event from '../event';
+
 export default class CalendarView extends Component {
   constructor(props) {
     super(props);
     var xDate = new XDate(true);
+    //40 is the default price
+    this.price = 40;
     this.state = {
       selectedDate: { dateString: xDate.toString('yyyy-MM-dd'), day: xDate.getDate(), month: xDate.getMonth() + 1, timestamp: 0, year: xDate.getFullYear(), date: xDate },
       dateQtyArray: null,
@@ -18,11 +22,18 @@ export default class CalendarView extends Component {
   }
 
   componentDidMount() {
+    //get date array for setting quantity
     AsyncStorage.getItem('@PurchaseTracker:' + this.state.selectedDate.date.toString('yyyyMM')).then((dateQtyArray) => {
       dateQtyArray = dateQtyArray ? JSON.parse(dateQtyArray) : null;
-      console.log(dateQtyArray);
       this.setState({ isLoading: false, dateQtyArray });
     });
+    //also get price for sending it over to the form component
+    AsyncStorage.getItem('price').then((price) => {
+      if (price)
+        this.price = price;
+    });
+    //set a listener for when component price disappears so that we know price was changed
+    event.on('PriceChanged', this.priceChanged);
   }
 
   setDateArray = async (quantity) => {
@@ -40,14 +51,19 @@ export default class CalendarView extends Component {
       }
       //if index is not found, create the object and push in array
       else {
-        dateQtyArray.push({ "dateString": this.state.selectedDate.dateString, "quantity": quantity, "color": this.HSVtoRGB(Math.random(), 0.7, 0.7) })
+        dateQtyArray.push({ "dateString": this.state.selectedDate.dateString, "quantity": quantity, "color": this.HSVtoRGB(Math.random(), 0.7, 0.7), "price": this.price })
       }
     }
     //date array is not found, create date array
     else {
-      dateQtyArray = [{ "dateString": this.state.selectedDate.dateString, "quantity": this.state.qty, "color": this.HSVtoRGB(Math.random(), 0.7, 0.7) }]
+      dateQtyArray = [{ "dateString": this.state.selectedDate.dateString, "quantity": quantity, "color": this.HSVtoRGB(Math.random(), 0.7, 0.7), "price": this.price }]
     }
     this.updateDateArrayState(dateQtyArray);
+  }
+
+  priceChanged = (priceObj) => {
+    console.log('inside price change event listener');
+    this.price = priceObj.price;
   }
 
   updateDateArrayState = async (dateQtyArray) => {
@@ -55,7 +71,6 @@ export default class CalendarView extends Component {
       '@PurchaseTracker:' + this.state.selectedDate.date.toString('yyyyMM'),
       JSON.stringify(dateQtyArray)
     );
-    console.log('propsDateQtyArray at end ' + JSON.stringify(dateQtyArray));
     this.setState({ dateQtyArray });
   }
 
@@ -132,20 +147,21 @@ export default class CalendarView extends Component {
                 component: {
                   name: 'FormView',
                   passProps: {
-                    date:this.state.selectedDate.date,
+                    date: this.state.selectedDate.date,
                     callback: this.setDateArray
                   },
-                  options: { bottomTabs: {visible: false,
-                  drawBehind: true, animate:true }}
+                  options: {
+                    bottomTabs: {
+                      visible: false,
+                      drawBehind: true, animate: true
+                    },
+                    statusBar: {
+                      backgroundColor: 'white',
+                      style: 'dark'
+                    },
+                  }
                 }
               });
-              //hide tabs
-              /*Navigation.mergeOptions('BottomTabsId', {
-                bottomTabs: {
-                  visible: false,
-                  ...Platform.select({ android: { drawBehind: true } })
-                },
-              });*/
             }}>
             <Icon name="add" />
           </Fab>
