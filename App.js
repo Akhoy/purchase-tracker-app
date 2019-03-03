@@ -24,6 +24,9 @@ Navigation.setRoot({
             topBar: {
               visible: false,
               height:0
+            },
+            bottomTab:{
+              selectedIconColor:'red'
             }
           },
           children: [
@@ -56,7 +59,8 @@ Navigation.setRoot({
             },
             bottomTab: {
               icon: require('./images/icons8-calculator-24.png'),
-              text:'Calculator'
+              text:'Calculator',
+              selectedIconColor:'red'
             },
             statusBar:{
               backgroundColor:'white',
@@ -71,7 +75,8 @@ Navigation.setRoot({
           options: {
             bottomTab: {
               icon: require('./images/icons8-rupee-24.png'),
-              text:'Price'
+              text:'Price',              
+              selectedIconColor:'red'
             },
             statusBar:{
               backgroundColor:'white',

@@ -35,7 +35,6 @@ export default class FormView extends Component {
 
   _keyboardDidShow() {
     this.isKeyboardOpen = true;
-    console.log('this.iskeyboardopen in event listerberkeybowrd did show ' + this.isKeyboardOpen);
   }
 
   componentDidMount() {
@@ -50,7 +49,6 @@ export default class FormView extends Component {
         }
       })
     }).then(() => {
-      console.log('inside promise done!')
       this.goBackFunc();
     });
 
