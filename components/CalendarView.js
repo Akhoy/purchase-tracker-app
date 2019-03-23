@@ -113,14 +113,13 @@ export default class CalendarView extends Component {
     return (
       <View>
         <View behavior={(Platform.OS === 'ios') ? 'padding' : null} enabled>
-          <Calendar markedDates={{ [this.state.selectedDate.dateString]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }} selected={this.state.selectedDate.dateString} dateArray={this.state.dateQtyArray} bgColorFunc={this.HSVtoRGB} updateDateArrayState={this.updateDateArrayState} onDayPress={(day) => {
+          <Calendar markedDates={{ [this.state.selectedDate.dateString]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }} selected={[this.state.selectedDate.dateString]} dateArray={this.state.dateQtyArray} bgColorFunc={this.HSVtoRGB} updateDateArrayState={this.updateDateArrayState} onDayPress={(day) => {
             day.date = new XDate(day.dateString);
             this.setState({ selectedDate: day })
           }} theme={{
             'stylesheet.day.basic': {
               'base': {
                 width: '100%',
-                height: 90,
                 borderLeftColor: 'lightgrey',
                 borderBottomWidth: 1,
                 borderBottomColor: 'lightgrey',

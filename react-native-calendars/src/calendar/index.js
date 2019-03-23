@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   View,
   ViewPropTypes,
-  Text
+  Dimensions
 } from 'react-native';
 import PropTypes from 'prop-types';
 
 import XDate from 'xdate';
 import dateutils from '../dateutils';
-import {xdateToData, parseDate} from '../interface';
+import { xdateToData, parseDate } from '../interface';
 import styleConstructor from './style';
 import Day from './day/basic';
 import UnitDay from './day/period';
@@ -22,6 +22,7 @@ import shouldComponentUpdate from './updater';
 const viewPropTypes = ViewPropTypes || View.propTypes;
 
 const EmptyArray = [];
+let weekLength = 0;
 
 class Calendar extends Component {
   static propTypes = {
@@ -90,7 +91,9 @@ class Calendar extends Component {
     }
     this.state = {
       currentMonth,
-      height: undefined
+      height: 0,
+      totalCalHeight: null,
+      monthUpdated:false
     };
 
     this.updateMonth = this.updateMonth.bind(this);
@@ -102,13 +105,22 @@ class Calendar extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const current= parseDate(nextProps.current);
+    const current = parseDate(nextProps.current);
     if (current && current.toString('yyyy MM') !== this.state.currentMonth.toString('yyyy MM')) {
       this.setState({
         currentMonth: current.clone()
       });
     }
     this.dateQtyArray = nextProps.dateArray;
+  }
+
+  componentDidUpdate(){
+    if(this.state.monthUpdated){  
+      console.log('entered update');
+      let weekHeight = this.state.totalCalHeight / weekLength;
+      this.setState({ height: weekHeight, monthUpdated:false});
+      this.shouldComponentUpdate = {update:true}
+    }
   }
 
   updateMonth(day, doNotTriggerListeners) {
@@ -127,6 +139,7 @@ class Calendar extends Component {
           this.props.onVisibleMonthsChange([xdateToData(currMont)]);
         }
       }
+      this.setState({monthUpdated:true});
     });
   }
 
@@ -158,7 +171,7 @@ class Calendar extends Component {
   }
 
   renderDay(day, id) {
-    
+
     const minDate = parseDate(this.props.minDate);
     const maxDate = parseDate(this.props.maxDate);
     let state = '';
@@ -173,7 +186,7 @@ class Calendar extends Component {
     }
 
     if (!dateutils.sameMonth(day, this.state.currentMonth) && this.props.hideExtraDays) {
-      return (<View key={id} style={{flex: 1}}/>);
+      return (<View key={id} style={{ flex: 1 }} />);
     }
     const DayComp = this.getDayComponent();
     const date = day.getDate();
@@ -186,13 +199,13 @@ class Calendar extends Component {
     let objArray = index > -1 ? this.dateQtyArray[index] : null;
     let quantity = objArray ? objArray.quantity : null;
     let color = objArray ? objArray.color : null;
-    
+
     //save color for each item in the date array which has quantity - only for those cases where color is already not present
-    if(quantity && !color)
+    if (quantity && !color)
       color = this.props.bgColorFunc(Math.random(), 0.7, 0.7);
-    
+
     return (
-      <View style={{flex: 1, alignItems: 'center'}} key={id}>      
+      <View style={{ flex: 1, alignItems: 'center' }} key={id}>
         <DayComp
           state={state}
           theme={this.props.theme}
@@ -200,12 +213,12 @@ class Calendar extends Component {
           onLongPress={this.longPressDay}
           date={xdateToData(day)}
           marking={this.getDateMarking(day)}
-          height = {this.state.height}
-          index = {id}
+          height={this.state.height}
+          index={id}
           //pass quantity only if its there
-          quantity = {quantity}
+          quantity={quantity}
           color={color}
-          >
+        >
           {date}
         </DayComp>
       </View>
@@ -218,16 +231,16 @@ class Calendar extends Component {
     }
 
     switch (this.props.markingType) {
-    case 'period':
-      return UnitDay;
-    case 'multi-dot':
-      return MultiDotDay;
-    case 'multi-period':
-      return MultiPeriodDay;
-    case 'custom':
-      return SingleDay;
-    default:
-      return Day;
+      case 'period':
+        return UnitDay;
+      case 'multi-dot':
+        return MultiDotDay;
+      case 'multi-period':
+        return MultiPeriodDay;
+      case 'custom':
+        return SingleDay;
+      default:
+        return Day;
     }
   }
 
@@ -243,15 +256,15 @@ class Calendar extends Component {
     }
   }
 
-  renderWeekNumber (weekNumber) {
-    return <Day key={`week-${weekNumber}`} theme={this.props.theme} marking={{disableTouchEvent: true}} state='disabled' height={this.state.height}>{weekNumber}</Day>;
+  renderWeekNumber(weekNumber) {
+    return <Day key={`week-${weekNumber}`} theme={this.props.theme} marking={{ disableTouchEvent: true }} state='disabled' height={this.state.height}>{weekNumber}</Day>;
   }
 
   renderWeek(days, id) {
     const week = [];
     days.forEach((day, id2) => {
       week.push(this.renderDay(day, id2));
-    }, this);    
+    }, this);
 
     if (this.props.showWeekNumbers) {
       week.unshift(this.renderWeekNumber(days[days.length - 1].getWeek()));
@@ -259,27 +272,25 @@ class Calendar extends Component {
     return (<View style={this.style.week} key={id}>{week}</View>);
   }
 
-  calculateLayoutOfCalendar(heightOfHeader) {
-    heightOfHeader && heightOfHeader > 0 ? Dimensions.get('window').height - heightOfHeader : 0;
-  }
-
-  render() {    
+  render() {
     const days = dateutils.page(this.state.currentMonth, this.props.firstDay);
     const weeks = [];
     while (days.length) {
       weeks.push(this.renderWeek(days.splice(0, 7), weeks.length));
     }
+    weekLength = weeks.length;
+    
     let indicator;
     const current = parseDate(this.props.current);
     if (current) {
       const lastMonthOfDay = current.clone().addMonths(1, true).setDate(1).addDays(-1).toString('yyyy-MM-dd');
       if (this.props.displayLoadingIndicator &&
-          !(this.props.markedDates && this.props.markedDates[lastMonthOfDay])) {
+        !(this.props.markedDates && this.props.markedDates[lastMonthOfDay])) {
         indicator = true;
       }
-    }
+    } 
     return (
-      <View style={[this.style.container, this.props.style, {height:'100%'}]}>
+      <View style={[this.style.container, this.props.style, { height: '100%' }]}>
         <CalendarHeader
           theme={this.props.theme}
           hideArrows={this.props.hideArrows}
@@ -294,19 +305,19 @@ class Calendar extends Component {
           onPressArrowLeft={this.props.onPressArrowLeft}
           onPressArrowRight={this.props.onPressArrowRight}
         />
-               
-        <View style={[this.style.monthView, {height:'100%'}]} onLayout={(event) => {        
-          if (!this.state.height){
-            var {x, y, width, height} = event.nativeEvent.layout;
-            var hght = (height - y)/5;            
-            this.shouldComponentUpdate = {update:true};
-            this.setState({height:hght}, () => {
-            });
+
+        <View style={[this.style.monthView, { height: '100%' }]} onLayout={(event) => {
+          console.log('entered view event');
+          let { y, height } = event.nativeEvent.layout;
+          //height for only a single week
+          let totalCalHeight = height - y;
+          let weekHeight = totalCalHeight / weekLength;
+          this.setState({ totalCalHeight: totalCalHeight, height: weekHeight});
+          this.shouldComponentUpdate = { update: true };
+        }}>
+          {
+            weeks
           }
-        }}>        
-        {          
-          weeks
-        }
         </View>
       </View>);
   }

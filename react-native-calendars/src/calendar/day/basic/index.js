@@ -43,7 +43,6 @@ class Day extends Component {
   }
 
   render() {
-    
     const containerStyle = [this.style.base];
     const textStyle = [this.style.text];
     const dotStyle = [this.style.dot];
@@ -94,8 +93,8 @@ class Day extends Component {
     }
     return (
       <TouchableOpacity
-        //style={[containerStyle, {height:this.props.height, borderLeftWidth: (this.props.index % 7 !== 0) ? 1 : 0}]}
-        style={[containerStyle, {borderLeftWidth: (this.props.index % 7 !== 0) ? 1 : 0}]}
+        style={[containerStyle, {height:this.props.height, borderLeftWidth: (this.props.index % 7 !== 0) ? 1 : 0}]}
+        /*style={[containerStyle, {borderLeftWidth: (this.props.index % 7 !== 0) ? 1 : 0}]}*/
         onPress={this.onDayPress}
         onLongPress={this.onDayLongPress}
         activeOpacity={marking.activeOpacity}
