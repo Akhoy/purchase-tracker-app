@@ -1,57 +1,90 @@
 import React, { Component } from 'react';
 import { Navigation } from "react-native-navigation";
-import { Text, View, Platform, AsyncStorage, StatusBar } from 'react-native';
-import { Container, Header, Left, Body, Title, Button, Content, Form, Item, Input, Label, Icon } from 'native-base';
+import { Text, AsyncStorage, Picker } from 'react-native';
+import { Container, Header, Content } from 'native-base';
 import XDate from 'xdate';
-import event from '../event';
 
 export default class Total extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      total: 0
+      total: 0,
+      selectedMonth: new XDate(true).toString('M'),
+      selectedYear: new XDate(true).toString('yyyy')
     }
   }
   componentDidMount() {
     // Subscribe
-    this.navigationEventListener = Navigation.events().bindComponent(this);    
+    this.navigationEventListener = Navigation.events().bindComponent(this);
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     if (this.navigationEventListener) {
       this.navigationEventListener.remove();
-    }    
+    }
   }
   componentDidAppear() {
-    this.GetTotal();
+    this.setTotal(new XDate(true).toString('yyyyM'),{selectedMonth: new XDate(true).toString('M')});
   }
-  GetTotal = () => {
+  setTotal = (date, additionalParams) => {
+    console.log(`@PurchaseTracker:${date}`);
     //for now, will calculate total for the current month. later, will add a dropdown to select the month
-    AsyncStorage.getItem(`@PurchaseTracker:${new XDate(true).toString('yyyyMM')}`).then((dateQtyArray) => {
+    AsyncStorage.getItem(`@PurchaseTracker:${date}`).then((dateQtyArray) => {
+      console.log(dateQtyArray)
       dateQtyArray = dateQtyArray ? JSON.parse(dateQtyArray) : null;
       let total = 0;
       if (dateQtyArray) {
         //add the quantities
         dateQtyArray.forEach(element => {
           total += (+element.quantity * element.price);
-        });
-        this.setState({total});
+        });        
       }
+      this.setState({total, ...additionalParams});
     });
   }
-  render() {
-    
+  render() { 
     return (
       <Container style={{ height: '100%' }}>
-        <Header androidStatusBarColor="white" iosBarStyle="dark-content" style={{ backgroundColor: 'white', justifyContent: 'center' }}>
-          <Body style={{ textAlign: 'center' }}>
-            <Title style={{ alignSelf: 'center', color: 'black', fontSize:24 }}>Total in {new XDate(true).toString("MMM")}</Title>
-          </Body>
+        <Header androidStatusBarColor="white" iosBarStyle="dark-content" style={{ backgroundColor: 'white', alignItems:'center' }}>
+          <Text style={{ color: 'black', fontSize: 24, flexDirection:'column', marginTop:-3}}>Total in </Text>
+          <Picker
+            mode="dialog"
+            selectedValue= {this.state.selectedMonth}
+            style={{height: 50, width: 145}}
+            onValueChange={(itemValue) => {
+              console.log(itemValue)
+                this.setTotal(`${this.state.selectedYear}${itemValue}`, {selectedMonth: itemValue});
+              }
+            }>          
+          {   
+            ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((item, index) => {
+              return <Picker.Item label={item} value={(index+1).toString()} key={index} />
+            })
+          }
+          </Picker>
+          <Picker
+            mode="dialog"
+            selectedValue= {this.state.selectedYear}
+            style={{height: 50, width: 100}}
+            onValueChange={(itemValue) => {
+              this.setTotal(`${this.state.selectedYear}${itemValue}`, {selectedYear: itemValue});
+            }
+            }>          
+          {   
+            new Array(3).fill()
+            .map((item, index)=>{      
+              return (new XDate(true).toString('yyyy') - index).toString();
+            })
+            .map((item, index) => {
+              return <Picker.Item label={item} value={item} key={index} />
+            })
+          }
+          </Picker>
         </Header>
         <Content
           padder
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
           style={{ flex: 1 }}>
-          <Text style={{ justifyContent: 'center', fontWeight: 'bold', fontSize:88}}>{this.state.total}</Text>
+          <Text style={{ justifyContent: 'center', fontWeight: 'bold', fontSize: 88 }}>{this.state.total}</Text>
         </Content>
       </Container>
     );

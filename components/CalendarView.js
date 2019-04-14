@@ -23,10 +23,8 @@ export default class CalendarView extends Component {
 
   componentDidMount() {
     //get date array for setting quantity
-    AsyncStorage.getItem('@PurchaseTracker:' + this.state.selectedDate.date.toString('yyyyMM')).then((dateQtyArray) => {
-      dateQtyArray = dateQtyArray ? JSON.parse(dateQtyArray) : null;
-      this.setState({ isLoading: false, dateQtyArray });
-    });
+    console.log('@PurchaseTracker:' + this.state.selectedDate.date.toString('yyyyM'));
+    this.getDateArray(this.state.selectedDate.date.toString('yyyyM'));
     //also get price for sending it over to the form component
     AsyncStorage.getItem('price').then((price) => {
       if (price)
@@ -34,6 +32,14 @@ export default class CalendarView extends Component {
     });
     //set a listener for when component price disappears so that we know price was changed
     event.on('PriceChanged', this.priceChanged);
+  }
+
+  getDateArray(date){
+    AsyncStorage.getItem('@PurchaseTracker:' + date).then((dateQtyArray) => {
+      console.log('getdateQtyArray ' + dateQtyArray);
+      dateQtyArray = dateQtyArray ? JSON.parse(dateQtyArray) : null;
+      this.setState({ isLoading: false, dateQtyArray });
+    });
   }
 
   setDateArray = async (quantity) => {
@@ -66,9 +72,11 @@ export default class CalendarView extends Component {
     this.price = priceObj.price;
   }
 
-  updateDateArrayState = async (dateQtyArray) => {
+  updateDateArrayState = async (dateQtyArray) => {   
+    console.log('dateqty array in updatedatearraystate') ;
+    console.log(dateQtyArray);
     await AsyncStorage.setItem(
-      '@PurchaseTracker:' + this.state.selectedDate.date.toString('yyyyMM'),
+      '@PurchaseTracker:' + this.state.selectedDate.date.toString('yyyyM'),
       JSON.stringify(dateQtyArray)
     );
     this.setState({ dateQtyArray });
@@ -102,7 +110,7 @@ export default class CalendarView extends Component {
 
   //before rendering, check if dateArray exists. if it does, render from that. if it doesn't continue with normal rendering.
 
-  render() {
+  render() {    
     let { year, month, day } = this.state.selectedDate;
     let bgColorObj = this.HSVtoRGB(Math.random(), 0.7, 0.7);
     let invertedColor = invert(bgColorObj, true);
@@ -116,7 +124,7 @@ export default class CalendarView extends Component {
           <Calendar markedDates={{ [this.state.selectedDate.dateString]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }} selected={[this.state.selectedDate.dateString]} dateArray={this.state.dateQtyArray} bgColorFunc={this.HSVtoRGB} updateDateArrayState={this.updateDateArrayState} onDayPress={(day) => {
             day.date = new XDate(day.dateString);
             this.setState({ selectedDate: day })
-          }} theme={{
+          }} onMonthChange={(month) => this.getDateArray(`${month.year}${month.month}`)} theme={{
             'stylesheet.day.basic': {
               'base': {
                 width: '100%',
