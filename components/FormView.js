@@ -16,20 +16,12 @@ export default class FormView extends Component {
     this.goBack = false;
   }
   goBackFunc() {
-    if (this.isKeyboardOpen) {
-      this.goBack = true;
+    this.goBack = true;
+    if (this.isKeyboardOpen) {      
       Keyboard.dismiss();
     }
-    else {
-      //go back
+    else{
       Navigation.pop(this.props.componentId);
-      //show tabs
-      Navigation.mergeOptions('BottomTabsId', {
-        bottomTabs: {
-          visible: true,
-          ...Platform.select({ android: { drawBehind: false, animate: false } })
-        },
-      });
     }
   }
 
@@ -49,7 +41,7 @@ export default class FormView extends Component {
         }
       })
     }).then(() => {
-      this.goBackFunc();
+      Navigation.pop(this.props.componentId);
     });
 
   }

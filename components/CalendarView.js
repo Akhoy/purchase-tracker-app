@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { View, Platform, AsyncStorage, StatusBar } from 'react-native';
+import { View, Platform, AsyncStorage, StyleSheet, Dimensions, BackHandler } from 'react-native';
 import { Calendar } from '../react-native-calendars';
 import { Icon, Fab } from 'native-base';
 import { Navigation } from "react-native-navigation";
 import XDate from 'xdate';
-import invert from 'invert-color';
 
 import event from '../event';
 
@@ -17,13 +16,14 @@ export default class CalendarView extends Component {
     this.state = {
       selectedDate: { dateString: xDate.toString('yyyy-MM-dd'), day: xDate.getDate(), month: xDate.getMonth() + 1, timestamp: 0, year: xDate.getFullYear(), date: xDate },
       dateQtyArray: null,
-      isLoading: true
+      isLoading: true,
+      showView: false
     }
+    Navigation.events().bindComponent(this);
   }
 
   componentDidMount() {
     //get date array for setting quantity
-    console.log('@PurchaseTracker:' + this.state.selectedDate.date.toString('yyyyM'));
     this.getDateArray(this.state.selectedDate.date.toString('yyyyM'));
     //also get price for sending it over to the form component
     AsyncStorage.getItem('price').then((price) => {
@@ -34,7 +34,7 @@ export default class CalendarView extends Component {
     event.on('PriceChanged', this.priceChanged);
   }
 
-  getDateArray(date){
+  getDateArray(date) {
     AsyncStorage.getItem('@PurchaseTracker:' + date).then((dateQtyArray) => {
       console.log('getdateQtyArray ' + dateQtyArray);
       dateQtyArray = dateQtyArray ? JSON.parse(dateQtyArray) : null;
@@ -72,14 +72,19 @@ export default class CalendarView extends Component {
     this.price = priceObj.price;
   }
 
-  updateDateArrayState = async (dateQtyArray) => {   
-    console.log('dateqty array in updatedatearraystate') ;
+  updateDateArrayState = async (dateQtyArray) => {
+    console.log('dateqty array in updatedatearraystate');
     console.log(dateQtyArray);
     await AsyncStorage.setItem(
       '@PurchaseTracker:' + this.state.selectedDate.date.toString('yyyyM'),
       JSON.stringify(dateQtyArray)
     );
     this.setState({ dateQtyArray });
+  }
+
+  updateViewDisplay = () => {
+    console.log('in update view display');
+    this.setState({ showView: true });
   }
 
   HSVtoRGB(h, s, v) {
@@ -110,21 +115,18 @@ export default class CalendarView extends Component {
 
   //before rendering, check if dateArray exists. if it does, render from that. if it doesn't continue with normal rendering.
 
-  render() {    
-    let { year, month, day } = this.state.selectedDate;
-    let bgColorObj = this.HSVtoRGB(Math.random(), 0.7, 0.7);
-    let invertedColor = invert(bgColorObj, true);
+  render() {
     //condition to load from asyncstorage and check if dateArray exists. 
     if (this.state.isLoading) {
       return null;
     }
     return (
-      <View>
+      <View style={ this.state.showView ? [styles.container] : [styles.hiddenContainer] }>
         <View behavior={(Platform.OS === 'ios') ? 'padding' : null} enabled>
-          <Calendar markedDates={{ [this.state.selectedDate.dateString]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }} selected={[this.state.selectedDate.dateString]} dateArray={this.state.dateQtyArray} bgColorFunc={this.HSVtoRGB} updateDateArrayState={this.updateDateArrayState} onDayPress={(day) => {
+          <Calendar calendarViewLoad={true} markedDates={{ [this.state.selectedDate.dateString]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }} selected={[this.state.selectedDate.dateString]} dateArray={this.state.dateQtyArray} bgColorFunc={this.HSVtoRGB} updateDateArrayState={this.updateDateArrayState} onDayPress={(day) => {
             day.date = new XDate(day.dateString);
             this.setState({ selectedDate: day })
-          }} onMonthChange={(month) => this.getDateArray(`${month.year}${month.month}`)} theme={{
+          }} updateView={this.updateViewDisplay} onMonthChange={(month) => this.getDateArray(`${month.year}${month.month}`)} theme={{
             'stylesheet.day.basic': {
               'base': {
                 width: '100%',
@@ -178,3 +180,21 @@ export default class CalendarView extends Component {
 
   }
 }
+
+const window = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    position: 'absolute'
+  },
+  // This pushes the view out of the viewport, but why the negative bottom?
+  hiddenContainer: {
+    top: window.height,
+    bottom: -window.height
+  }
+});

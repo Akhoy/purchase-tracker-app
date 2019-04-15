@@ -101,7 +101,8 @@ class Calendar extends Component {
     this.pressDay = this.pressDay.bind(this);
     this.longPressDay = this.longPressDay.bind(this);
     this.shouldComponentUpdate = shouldComponentUpdate;
-    this.dateQtyArray = this.props.dateArray;
+    this.dateQtyArray = this.props.dateArray;    
+    this.isCalendarView = this.props.calendarViewLoad;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -115,8 +116,7 @@ class Calendar extends Component {
   }
 
   componentDidUpdate(){
-    if(this.state.monthUpdated){  
-      console.log('entered update');
+    if(this.state.monthUpdated){
       let weekHeight = this.state.totalCalHeight / weekLength;
       this.setState({ height: weekHeight, monthUpdated:false});
       this.shouldComponentUpdate = {update:true}
@@ -306,14 +306,18 @@ class Calendar extends Component {
           onPressArrowRight={this.props.onPressArrowRight}
         />
 
-        <View style={[this.style.monthView, { height: '100%' }]} onLayout={(event) => {
-          console.log('entered view event');
-          let { y, height } = event.nativeEvent.layout;
-          //height for only a single week
-          let totalCalHeight = height - y;
-          let weekHeight = totalCalHeight / weekLength;
-          this.setState({ totalCalHeight: totalCalHeight, height: weekHeight});
-          this.shouldComponentUpdate = { update: true };
+        <View style={[this.style.monthView, { height: '100%' }]}  onLayout={(event) => {
+          if(this.isCalendarView){
+            console.log('entered view');
+            let { y, height } = event.nativeEvent.layout;
+            //height for only a single week
+            let totalCalHeight = height - y;
+            let weekHeight = totalCalHeight / weekLength;
+            this.setState({ totalCalHeight: totalCalHeight, height: weekHeight});
+            this.isCalendarView = false;
+            this.shouldComponentUpdate = { update: true };       
+            this.props.updateView();         
+          }
         }}>
           {
             weeks
