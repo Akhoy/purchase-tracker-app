@@ -1,4 +1,4 @@
-package com.trackerapp;
+package com.milkexpensetrackerapp;
 
 import android.app.Application;
 

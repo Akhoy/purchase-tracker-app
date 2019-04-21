@@ -2,11 +2,13 @@ import { Navigation } from "react-native-navigation";
 import CalendarView from "./components/CalendarView";
 import FormView from "./components/FormView";
 import TotalView from "./components/TotalView";
+import SettingsView from "./components/SettingsView";
 import PriceView from "./components/PriceView";
 
 Navigation.registerComponent(`CalendarView`, () => CalendarView);
 Navigation.registerComponent(`FormView`, () => FormView);
 Navigation.registerComponent(`TotalView`, () => TotalView);
+Navigation.registerComponent(`SettingsView`, () => SettingsView);
 Navigation.registerComponent(`PriceView`, () => PriceView);
 
 Navigation.events().registerAppLaunchedListener(() => {
@@ -71,19 +73,34 @@ Navigation.events().registerAppLaunchedListener(() => {
           }
         },
         {
-          component: {
-            name: 'PriceView',
-            options: {
-              bottomTab: {
-                icon: require('./images/icons8-rupee-24.png'),
-                text:'Price',              
-                selectedIconColor:'red'
+          stack: {
+            options: {             
+              topBar: {
+                visible: false,
+                height:0
               },
-              statusBar:{
-                backgroundColor:'white',
-                style:'dark'
+              bottomTab:{
+                selectedIconColor:'red'
               }
-            }
+            },
+            children: [
+              {
+                component: {
+                  name: 'SettingsView',
+                  options: {
+                    bottomTab: {
+                      icon: require('./images/settings.png'),
+                      text:'Settings',              
+                      selectedIconColor:'red'
+                    },
+                    statusBar:{
+                      backgroundColor:'white',
+                      style:'dark'
+                    }
+                  }
+                }
+              }
+            ]
           }
         }]
       }

@@ -95,15 +95,15 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "com.trackerapp"
+        applicationId "com.milkexpensetrackerapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative57_5"
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
